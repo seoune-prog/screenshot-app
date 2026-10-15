@@ -348,8 +348,6 @@ struct CaptureRow: View {
                     HStack(spacing: 4) {
                         Button(action: onCopy) { Image(systemName: "doc.on.doc") }
                             .help("복사")
-                        Button(action: onEdit) { Image(systemName: "pencil") }
-                            .help("편집 (더블클릭)")
                         Button(action: onDelete) { Image(systemName: "trash") }
                             .help("삭제")
                     }
