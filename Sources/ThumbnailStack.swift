@@ -259,6 +259,7 @@ final class ThumbnailView: NSView, NSDraggingSource {
     private let imageLayer = CALayer()
     private let overlay = PassthroughView()
     private let badge = GlassBox(cornerRadius: 12, overDesktop: true)
+    private var copyButton: NSButton?
 
     init?(url: URL, width: CGFloat) {
         guard let image = NSImage(contentsOf: url), image.size.width > 0 else { return nil }
@@ -288,7 +289,7 @@ final class ThumbnailView: NSView, NSDraggingSource {
         let check = NSImageView(image: NSImage(systemSymbolName: "checkmark", accessibilityDescription: "클립보드")!)
         check.symbolConfiguration = .init(pointSize: 11, weight: .bold)
         check.contentTintColor = .controlAccentColor
-        badge.frame = NSRect(x: 8, y: bounds.height - 32, width: 24, height: 24)
+        badge.frame = NSRect(x: 8, y: bounds.height - 34, width: 28, height: 28)
         badge.contentView = check
         badge.toolTip = "지금 클립보드"
         addSubview(badge)
@@ -303,8 +304,12 @@ final class ThumbnailView: NSView, NSDraggingSource {
         let text = makeButton(symbol: "text.viewfinder", tip: "텍스트 복사", action: #selector(textClicked))
         let pin = makeButton(symbol: "pin", tip: "화면에 고정", action: #selector(pinClicked))
         let close = makeButton(symbol: "xmark", tip: "닫기", action: #selector(closeClicked))
-        for (i, button) in [copy, text, pin, close].enumerated() {
-            button.frame.origin = NSPoint(x: bounds.width - 132 + CGFloat(i) * 32, y: bounds.height - 34)
+        copyButton = copy
+        copy.frame = badge.frame
+        copy.isHidden = isSelected
+        overlay.addSubview(copy)
+        for (i, button) in [text, pin, close].enumerated() {
+            button.frame.origin = NSPoint(x: bounds.width - 100 + CGFloat(i) * 32, y: bounds.height - 34)
             overlay.addSubview(button)
         }
 
@@ -349,6 +354,7 @@ final class ThumbnailView: NSView, NSDraggingSource {
     }
 
     private func updateBorder() {
+        copyButton?.isHidden = isSelected
         guard isSelected != !badge.isHidden else { return }
         badge.isHidden = !isSelected
         guard isSelected, !Motion.reduced, let layer = badge.layer else { return }
